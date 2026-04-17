@@ -1,0 +1,22 @@
+{
+  "name": "ng-inspector",
+  "version": "0.0.0",
+  "description": "Angular workspace auditor CLI",
+  "type": "commonjs",
+  "bin": {
+    "ng-inspector": "dist/bin.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@ng-inspector/core": "file:../core"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test"
+  }
+}
+

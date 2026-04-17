@@ -1,0 +1,290 @@
+{
+  "schemaVersion": 7,
+  "generatedAt": "2026-04-16T00:00:00.000Z",
+  "workspaceRoot": "/path/to/angular-workspace",
+  "angularJsonPath": "/path/to/angular-workspace/angular.json",
+  "projects": [
+    {
+      "name": "demo",
+      "root": "apps/demo",
+      "sourceRoot": "apps/demo/src",
+      "components": [{ "filePath": "apps/demo/src/app/app.component.ts" }],
+      "directives": [],
+      "pipes": [],
+      "services": [{ "filePath": "apps/demo/src/app/api.service.ts" }],
+      "routes": [{ "filePath": "apps/demo/src/app/app.routes.ts", "path": "" }]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "warning",
+      "category": "components",
+      "confidence": "high",
+      "code": "component-large-template",
+      "message": "Component template is large (420 lines).",
+      "whyItMatters": "Large templates become hard to maintain and review.",
+      "suggestedActions": ["Extract smaller presentational components.", "Move repeated blocks into reusable components."],
+      "filePath": "apps/demo/src/app/app.component.ts",
+      "metadata": {
+        "projectName": "demo",
+        "templateKind": "external",
+        "templateFilePath": "apps/demo/src/app/app.component.html",
+        "templateLineCount": 420,
+        "maxTemplateLines": 250
+      }
+    },
+    {
+      "severity": "warning",
+      "category": "lifecycle",
+      "confidence": "high",
+      "code": "lifecycle-fromEvent-subscribe-no-cleanup",
+      "message": "apps/demo/src/app/app.component.ts subscribes to fromEvent(...) without a clear cleanup signal.",
+      "whyItMatters": "fromEvent streams do not complete on their own; unmanaged subscriptions can leak event listeners.",
+      "suggestedActions": ["Use takeUntilDestroyed() in the pipe chain.", "Or store the Subscription and unsubscribe in ngOnDestroy."],
+      "filePath": "apps/demo/src/app/app.component.ts",
+      "metadata": {
+        "className": "AppComponent",
+        "methodName": "ngOnInit",
+        "line": 42,
+        "column": 5,
+        "eventName": "resize",
+        "targetText": "window"
+      }
+    },
+    {
+      "severity": "info",
+      "category": "imports",
+      "confidence": "medium",
+      "code": "import-cycle",
+      "message": "Import cycle detected (3 files).",
+      "whyItMatters": "Cycles make refactors riskier and can create hidden coupling.",
+      "suggestedActions": [
+        "Introduce a shared abstraction or split responsibilities.",
+        "Avoid deep circular re-exports."
+      ],
+      "filePath": "apps/demo/src/app/a.ts",
+      "metadata": {
+        "nodes": ["apps/demo/src/app/a.ts", "apps/demo/src/app/b.ts", "apps/demo/src/app/c.ts"],
+        "nodeCount": 3
+      }
+    }
+  ],
+  "importGraph": { "nodes": 12, "edges": 24, "cycles": 1 },
+  "summary": { "projects": 1, "components": 1, "services": 1, "routes": 1 },
+  "projectTree": {
+    "projects": [
+      {
+        "name": "demo",
+        "root": "apps/demo",
+        "sourceRoot": "apps/demo/src",
+        "sourceRoots": [
+          {
+            "sourceRoot": "apps/demo/src",
+            "rootFolder": {
+              "path": "apps/demo/src",
+              "folders": [
+                {
+                  "path": "apps/demo/src/app",
+                  "folders": [
+                    {
+                      "path": "apps/demo/src/app/editor",
+                      "folders": [],
+                      "files": [
+                        {
+                          "filePath": "apps/demo/src/app/editor/editor.component.ts",
+                          "classes": [
+                            {
+                              "classId": "class:apps/demo/src/app/editor/editor.component.ts#EditorComponent@1",
+                              "methodIds": [
+                                "method:apps/demo/src/app/editor/editor.component.ts#EditorComponent.save@15"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "components": [],
+                      "directives": [],
+                      "pipes": [],
+                      "services": [],
+                      "routes": []
+                    }
+                  ],
+                  "files": [
+                    {
+                      "filePath": "apps/demo/src/app/app.component.ts",
+                      "classes": [
+                        {
+                          "classId": "class:apps/demo/src/app/app.component.ts#AppComponent@1",
+                          "methodIds": [
+                            "method:apps/demo/src/app/app.component.ts#AppComponent.onSave@12",
+                            "method:apps/demo/src/app/app.component.ts#AppComponent.onCancel@30"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "components": [{ "filePath": "apps/demo/src/app/app.component.ts" }],
+                  "directives": [],
+                  "pipes": [],
+                  "services": [{ "filePath": "apps/demo/src/app/api.service.ts" }],
+                  "routes": [{ "filePath": "apps/demo/src/app/app.routes.ts", "path": "" }]
+                }
+              ],
+              "files": [],
+              "components": [],
+              "directives": [],
+              "pipes": [],
+              "services": [],
+              "routes": []
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "symbols": {
+    "files": [
+      { "id": "file:apps/demo/src/app/app.component.ts", "filePath": "apps/demo/src/app/app.component.ts" },
+      {
+        "id": "file:apps/demo/src/app/editor/editor.component.ts",
+        "filePath": "apps/demo/src/app/editor/editor.component.ts"
+      }
+    ],
+    "classes": [
+      {
+        "id": "class:apps/demo/src/app/app.component.ts#AppComponent@1",
+        "name": "AppComponent",
+        "filePath": "apps/demo/src/app/app.component.ts",
+        "startLine": 1,
+        "endLine": 120
+      },
+      {
+        "id": "class:apps/demo/src/app/editor/editor.component.ts#EditorComponent@1",
+        "name": "EditorComponent",
+        "filePath": "apps/demo/src/app/editor/editor.component.ts",
+        "startLine": 1,
+        "endLine": 80
+      }
+    ],
+    "methods": [
+      {
+        "id": "method:apps/demo/src/app/app.component.ts#AppComponent.onSave@12",
+        "name": "onSave",
+        "filePath": "apps/demo/src/app/app.component.ts",
+        "classId": "class:apps/demo/src/app/app.component.ts#AppComponent@1",
+        "className": "AppComponent",
+        "visibility": "public",
+        "startLine": 12,
+        "endLine": 20,
+        "metrics": { "lineCount": 9, "branchCount": 2, "parameterCount": 1 }
+      },
+      {
+        "id": "method:apps/demo/src/app/app.component.ts#AppComponent.onCancel@30",
+        "name": "onCancel",
+        "filePath": "apps/demo/src/app/app.component.ts",
+        "classId": "class:apps/demo/src/app/app.component.ts#AppComponent@1",
+        "className": "AppComponent",
+        "visibility": "public",
+        "startLine": 30,
+        "endLine": 33,
+        "metrics": { "lineCount": 4, "branchCount": 0, "parameterCount": 0 }
+      },
+      {
+        "id": "method:apps/demo/src/app/editor/editor.component.ts#EditorComponent.save@15",
+        "name": "save",
+        "filePath": "apps/demo/src/app/editor/editor.component.ts",
+        "classId": "class:apps/demo/src/app/editor/editor.component.ts#EditorComponent@1",
+        "className": "EditorComponent",
+        "visibility": "public",
+        "startLine": 15,
+        "endLine": 23,
+        "metrics": { "lineCount": 9, "branchCount": 1, "parameterCount": 1 }
+      }
+    ]
+  },
+  "methodReferences": [
+    {
+      "methodId": "method:apps/demo/src/app/app.component.ts#AppComponent.onSave@12",
+      "filePath": "apps/demo/src/app/app.component.ts",
+      "line": 55,
+      "column": 10,
+      "snippet": "this.onSave(form.value)"
+    }
+  ],
+  "duplicateGroups": [
+    {
+      "id": "dup:normalized:abc",
+      "kind": "normalized",
+      "hash": "abc",
+      "tokenCount": 44,
+      "lineCount": 10,
+      "preview": "save(value) { /* ... */ }",
+      "occurrences": [
+        {
+          "filePath": "apps/demo/src/app/app.component.ts",
+          "startLine": 12,
+          "endLine": 20,
+          "lineCount": 10,
+          "tokenCount": 44,
+          "methodId": "method:apps/demo/src/app/app.component.ts#AppComponent.onSave@12"
+        },
+        {
+          "filePath": "apps/demo/src/app/editor/editor.component.ts",
+          "startLine": 15,
+          "endLine": 23,
+          "lineCount": 10,
+          "tokenCount": 44,
+          "methodId": "method:apps/demo/src/app/editor/editor.component.ts#EditorComponent.save@15"
+        }
+      ]
+    }
+  ],
+  "hotspotScores": [
+    {
+      "filePath": "apps/demo/src/app/app.component.ts",
+      "score": 17.5,
+      "factors": {
+        "complexity": 6,
+        "duplication": 4,
+        "missingSpec": 2,
+        "importFanIn": 3,
+        "importFanOut": 2.5
+      },
+      "metrics": {
+        "lineCount": 320,
+        "methodCount": 14,
+        "constructorParamCountMax": 6,
+        "branchCount": 22,
+        "duplicateGroupCount": 1,
+        "duplicateOccurrenceCount": 3,
+        "duplicatedLineCount": 48,
+        "missingSpec": false,
+        "fanIn": 8,
+        "fanOut": 12
+      }
+    }
+  ],
+  "analyzerCategories": [
+    {
+      "id": "components",
+      "title": "Components",
+      "description": "Component analyzers",
+      "findingCodes": ["component-large-template"],
+      "reportKeys": ["findings", "projectTree"]
+    },
+    {
+      "id": "imports",
+      "title": "Imports",
+      "description": "Import graph + cycles",
+      "findingCodes": ["import-cycle"],
+      "reportKeys": ["importGraph"]
+    },
+    {
+      "id": "symbols",
+      "title": "Symbols",
+      "description": "Class/method index for drilldown UIs",
+      "findingCodes": [],
+      "reportKeys": ["symbols", "methodReferences"]
+    }
+  ]
+}

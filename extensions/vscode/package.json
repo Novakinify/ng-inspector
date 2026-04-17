@@ -1,0 +1,55 @@
+{
+  "name": "ng-inspector-vscode",
+  "displayName": "ng-inspector",
+  "description": "VS Code extension for ng-inspector (Angular workspace auditor).",
+  "version": "0.0.0",
+  "publisher": "ng-inspector",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onCommand:ngInspector.runAudit",
+    "onCommand:ngInspector.openHtmlReport",
+    "onCommand:ngInspector.refreshFindings",
+    "onView:ngInspector.findingsView"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "ngInspector.runAudit",
+        "title": "ng-inspector: Run Audit"
+      },
+      {
+        "command": "ngInspector.openHtmlReport",
+        "title": "ng-inspector: Open HTML Report"
+      },
+      {
+        "command": "ngInspector.refreshFindings",
+        "title": "ng-inspector: Refresh Findings"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ngInspector",
+          "title": "ng-inspector",
+          "icon": "resources/ng-inspector.svg"
+        }
+      ]
+    },
+    "views": {
+      "ngInspector": [
+        {
+          "id": "ngInspector.findingsView",
+          "name": "Findings"
+        }
+      ]
+    }
+  }
+}
+

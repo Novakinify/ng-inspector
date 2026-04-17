@@ -1,0 +1,194 @@
+@if (report(); as r) {
+  <section class="page">
+    <header class="page__header">
+      <h1 class="page__title">Lifecycle Risks</h1>
+      <p class="page__subtitle">
+        Conservative cleanup-risk findings from the lifecycle analyzer. Click a finding to see the exact code span,
+        likely source, detected signals, and a suggested fix pattern.
+      </p>
+    </header>
+
+    @if (findings().length === 0) {
+      <div class="note">
+        No lifecycle findings in this report. If you expected them, rerun <span class="mono">ng-inspector audit</span>.
+      </div>
+    }
+
+    <div class="split">
+      <section class="pane pane--left" aria-label="Lifecycle findings">
+        <div class="filters">
+          <div class="filters__group">
+            <label class="label">Severity</label>
+            <div class="seg">
+              <button class="seg__btn" [class.is-on]="severity() === 'all'" (click)="severity.set('all')">
+                All ({{ findings().length }})
+              </button>
+              <button class="seg__btn" [class.is-on]="severity() === 'error'" (click)="severity.set('error')">
+                Error ({{ counts().error }})
+              </button>
+              <button class="seg__btn" [class.is-on]="severity() === 'warning'" (click)="severity.set('warning')">
+                Warning ({{ counts().warning }})
+              </button>
+              <button class="seg__btn" [class.is-on]="severity() === 'info'" (click)="severity.set('info')">
+                Info ({{ counts().info }})
+              </button>
+            </div>
+          </div>
+
+          <div class="filters__group">
+            <label class="label" for="q">Search</label>
+            <input
+              id="q"
+              class="input"
+              type="text"
+              placeholder="search message, file, rule code"
+              [value]="query()"
+              (input)="onQueryInput($event)"
+            />
+          </div>
+        </div>
+
+        <div class="list">
+          @for (f of visible(); track trackFinding(f)) {
+            <button
+              type="button"
+              class="item"
+              [class.is-selected]="selectedKey() === trackFinding(f)"
+              (click)="selectFinding(f)"
+            >
+              <div class="item__head">
+                <span class="badge" [class]="'badge--' + f.severity">{{ f.severity }}</span>
+                <span class="mono">{{ f.code }}</span>
+              </div>
+              <div class="msg">{{ f.message }}</div>
+              <div class="meta mono dim">{{ f.filePath }}{{ locLabel(f) ? " " + locLabel(f) : "" }}</div>
+            </button>
+          }
+        </div>
+      </section>
+
+      <section class="pane pane--right" aria-label="Lifecycle details">
+        @if (selected(); as f) {
+          <div class="detail">
+            <header class="detail__head">
+              <div class="detail__title">
+                <span class="badge" [class]="'badge--' + f.severity">{{ f.severity }}</span>
+                <span class="mono">{{ f.code }}</span>
+              </div>
+              <div class="detail__sub mono dim">
+                {{ f.filePath }}{{ locLabel(f) ? " " + locLabel(f) : "" }}
+                @if (classMethodLabel(f); as lbl) {
+                  @if (lbl) {
+                    <span class="dot"></span>
+                    {{ lbl }}
+                  }
+                }
+              </div>
+              <div class="detail__msg">{{ f.message }}</div>
+            </header>
+
+            <div class="blocks">
+              <section class="card">
+                <div class="card__head">
+                  <div class="card__title">Code Span</div>
+                  <div class="card__meta mono">
+                    @if (spanLoading()) {
+                      loading
+                    } @else if (spanError()) {
+                      unavailable
+                    } @else if (span()) {
+                      loaded
+                    } @else {
+                      --
+                    }
+                  </div>
+                </div>
+
+                @if (span(); as s) {
+                  @if (s.spanText) {
+                    <pre class="pre">{{ s.spanText }}</pre>
+                  }
+                  <div class="code">
+                    @for (line of s.lines; track line.line) {
+                      <div class="code__line" [class.is-hit]="line.line === s.highlightLine">
+                        <span class="code__ln mono">{{ line.line }}</span>
+                        <span class="code__txt mono">{{ line.text }}</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="caret mono" [style.paddingLeft.px]="caretPadPx(s.highlightColumn)">^</div>
+                } @else if (spanError()) {
+                  <div class="muted">
+                    {{ spanError() }}
+                    <div class="muted" style="margin-top: 8px;">
+                      Tip: code spans require the local scan server. Run <span class="mono">npm run dashboard:local</span>
+                      or set the API base URL in <a routerLink="/scans">Scans</a>.
+                    </div>
+                  </div>
+                } @else {
+                  <div class="muted">Select a finding to load a code span.</div>
+                }
+              </section>
+
+              <section class="card">
+                <div class="card__head">
+                  <div class="card__title">Source</div>
+                  <div class="card__meta mono">{{ sourceKind(f) }}</div>
+                </div>
+                <pre class="pre">{{ sourceSummary(f) }}</pre>
+              </section>
+
+              <section class="card">
+                <div class="card__head">
+                  <div class="card__title">Signals</div>
+                  <div class="card__meta mono">{{ signalsLabel(signalsFor(f)) }}</div>
+                </div>
+                <div class="kv">
+                  <div class="kv__k">ngOnDestroy</div>
+                  <div class="kv__v mono">{{ signalsFor(f).hasNgOnDestroy }}</div>
+                  <div class="kv__k">takeUntilDestroyed</div>
+                  <div class="kv__v mono">{{ signalsFor(f).hasTakeUntilDestroyed }}</div>
+                  <div class="kv__k">takeUntil</div>
+                  <div class="kv__v mono">{{ signalsFor(f).hasTakeUntil }}</div>
+                  <div class="kv__k">unsubscribe</div>
+                  <div class="kv__v mono">{{ signalsFor(f).hasUnsubscribe }}</div>
+                  <div class="kv__k">cleanup</div>
+                  <div class="kv__v mono">{{ signalsFor(f).hasCleanup }}</div>
+                </div>
+                @if (signalNotes(f); as notes) {
+                  @if (notes) {
+                    <div class="note note--mini">{{ notes }}</div>
+                  }
+                }
+              </section>
+
+              <section class="card">
+                <div class="card__head">
+                  <div class="card__title">Suggested Fix Pattern</div>
+                  <div class="card__meta mono">copy/paste starter</div>
+                </div>
+                <pre class="pre">{{ fixPattern(f) }}</pre>
+                @if (f.suggestedActions.length > 0) {
+                  <ul class="actions">
+                    @for (a of f.suggestedActions; track a) {
+                      <li>{{ a }}</li>
+                    }
+                  </ul>
+                }
+              </section>
+            </div>
+          </div>
+        } @else {
+          <div class="detail detail--empty">
+            <div class="detail__title">Select a lifecycle finding</div>
+            <div class="detail__text">
+              Choose an item on the left to inspect the risk and the recommended cleanup pattern.
+            </div>
+          </div>
+        }
+      </section>
+    </div>
+  </section>
+} @else {
+  <ngi-empty-state />
+}

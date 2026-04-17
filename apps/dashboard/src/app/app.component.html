@@ -1,0 +1,103 @@
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="brand__mark" aria-hidden="true">ngi</div>
+      <div class="brand__text">
+        <div class="brand__name">ng-inspector</div>
+        <div class="brand__tag">Dashboard</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Sections">
+      <a routerLink="/scans" routerLinkActive="is-active" class="nav__item">
+        <span>Scans</span>
+      </a>
+      <a routerLink="/overview" routerLinkActive="is-active" class="nav__item">
+        <span>Overview</span>
+      </a>
+      <a routerLink="/findings" routerLinkActive="is-active" class="nav__item">
+        <span>Findings</span>
+        @if (findingsCount() > 0) {
+          <span class="pill mono">{{ findingsCount() }}</span>
+        }
+      </a>
+      <a routerLink="/lifecycle" routerLinkActive="is-active" class="nav__item">
+        <span>Lifecycle Risks</span>
+        @if (lifecycleCount() > 0) {
+          <span class="pill mono">{{ lifecycleCount() }}</span>
+        }
+      </a>
+      <a routerLink="/project-tree" routerLinkActive="is-active" class="nav__item">
+        <span>Project Tree</span>
+      </a>
+      <a routerLink="/hotspots" routerLinkActive="is-active" class="nav__item">
+        <span>Hotspots</span>
+        @if (hotspotsCount() > 0) {
+          <span class="pill mono">{{ hotspotsCount() }}</span>
+        }
+      </a>
+      <a routerLink="/duplicates" routerLinkActive="is-active" class="nav__item">
+        <span>Duplicates</span>
+        @if (duplicatesCount() > 0) {
+          <span class="pill mono">{{ duplicatesCount() }}</span>
+        }
+      </a>
+      <a routerLink="/import-graph" routerLinkActive="is-active" class="nav__item">
+        <span>Import Graph</span>
+        @if (cyclesCount() > 0) {
+          <span class="pill mono">{{ cyclesCount() }}</span>
+        }
+      </a>
+    </nav>
+
+    <div class="side__footer">
+      <div class="mini">
+        <div class="mini__k">Report</div>
+        @if (report(); as r) {
+          <div class="mini__v mono" [title]="r.workspaceRoot">{{ r.workspaceRoot }}</div>
+          <div class="mini__m mono">{{ r.generatedAt }}</div>
+        } @else {
+          <div class="mini__v dim">Not loaded</div>
+        }
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="top__left">
+        <div class="top__title">ng-inspector</div>
+        <div class="top__status">
+          @if (loading()) {
+            <span class="status status--spin">Loading…</span>
+          } @else {
+            @if (error(); as err) {
+              <span class="status status--error" [title]="err">Error: {{ err }}</span>
+            } @else if (report()) {
+              <span class="status status--ok">Report loaded</span>
+            } @else {
+              <span class="status">Load a report.json to begin</span>
+            }
+          }
+        </div>
+      </div>
+
+      <div class="top__actions">
+        <input
+          #fileInput
+          type="file"
+          accept="application/json,.json"
+          class="file"
+          (change)="onFileChosen($event)"
+        />
+        <button type="button" class="btn" (click)="fileInput.click()">Load report.json</button>
+        <button type="button" class="btn btn--ghost" (click)="loadMock()">Load mock</button>
+        <button type="button" class="btn btn--ghost" [disabled]="!report()" (click)="clear()">Clear</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

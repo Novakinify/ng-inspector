@@ -1,0 +1,246 @@
+@if (report(); as r) {
+  <section class="page">
+    <header class="page__header">
+      <h1 class="page__title">Project Tree</h1>
+      <p class="page__subtitle">
+        Expand projects and navigate folders, files, classes, and methods. Select an item to see details.
+      </p>
+    </header>
+
+    @if (r.symbols.methods.length === 0) {
+      <div class="note">
+        This report does not include a symbol index (classes/methods). Rerun
+        <span class="mono">ng-inspector audit</span> with a newer CLI/report (schemaVersion 7+).
+      </div>
+    }
+
+    <div class="split">
+      <section class="pane pane--left" aria-label="Project tree">
+        <div class="tree">
+          @for (row of rows(); track row.id) {
+            <div
+              class="row"
+              [class.is-selected]="selected()?.id === row.id"
+              [style.paddingLeft.px]="10 + row.depth * 14"
+              (click)="onRowClick(row)"
+              [title]="rowTitle(row)"
+            >
+              @if (row.hasChildren) {
+                <button
+                  type="button"
+                  class="toggle"
+                  (click)="onToggle(row.id, $event)"
+                  [attr.aria-expanded]="expanded().has(row.id)"
+                  [title]="expanded().has(row.id) ? 'Collapse' : 'Expand'"
+                >
+                  <span class="chev" [class.chev--open]="expanded().has(row.id)">&gt;</span>
+                </button>
+              } @else {
+                <span class="toggle toggle--spacer" aria-hidden="true"></span>
+              }
+
+              <span class="label mono" [class.dim]="row.kind === 'sourceRoot'">
+                {{ row.label }}
+              </span>
+
+              @if (row.meta) {
+                <span class="meta mono">{{ row.meta }}</span>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="pane pane--right" aria-label="Details">
+        @if (detail(); as d) {
+          @switch (d.kind) {
+            @case ("empty") {
+              <div class="detail detail--empty">
+                <div class="detail__title">Select an item</div>
+                <div class="detail__text">Pick a node on the left to inspect details.</div>
+              </div>
+            }
+            @case ("missing") {
+              <div class="detail">
+                <div class="detail__title">{{ d.title }}</div>
+                <div class="detail__text">{{ d.message }}</div>
+              </div>
+            }
+            @case ("project") {
+              <div class="detail">
+                <div class="detail__title mono">{{ d.project.name }}</div>
+                <div class="kv">
+                  <div class="kv__k">root</div>
+                  <div class="kv__v mono">{{ d.project.root || "--" }}</div>
+                  <div class="kv__k">sourceRoot</div>
+                  <div class="kv__v mono">{{ d.project.sourceRoot || "--" }}</div>
+                  <div class="kv__k">source roots</div>
+                  <div class="kv__v mono">{{ d.project.sourceRoots.length }}</div>
+                </div>
+              </div>
+            }
+            @case ("sourceRoot") {
+              <div class="detail">
+                <div class="detail__title mono">{{ d.sourceRoot.sourceRoot }}</div>
+                <div class="kv">
+                  <div class="kv__k">project</div>
+                  <div class="kv__v mono">{{ d.project.name }}</div>
+                  <div class="kv__k">items</div>
+                  <div class="kv__v mono">
+                    {{ d.sourceRoot.rootFolder.folders.length + d.sourceRoot.rootFolder.files.length }}
+                  </div>
+                </div>
+              </div>
+            }
+            @case ("folder") {
+              <div class="detail">
+                <div class="detail__title mono">{{ d.folder.path }}</div>
+                <div class="kv">
+                  <div class="kv__k">folders</div>
+                  <div class="kv__v mono">{{ d.counts.folders }}</div>
+                  <div class="kv__k">files</div>
+                  <div class="kv__v mono">{{ d.counts.files }}</div>
+                  <div class="kv__k">classes</div>
+                  <div class="kv__v mono">{{ d.counts.classes }}</div>
+                  <div class="kv__k">methods</div>
+                  <div class="kv__v mono">{{ d.counts.methods }}</div>
+                </div>
+              </div>
+            }
+            @case ("file") {
+              <div class="detail">
+                <div class="detail__title mono">{{ d.file.filePath }}</div>
+
+                <div class="kv">
+                  <div class="kv__k">classes</div>
+                  <div class="kv__v mono">{{ d.classes.length }}</div>
+                  <div class="kv__k">methods</div>
+                  <div class="kv__v mono">{{ d.methods.length }}</div>
+                  <div class="kv__k">hotspot score</div>
+                  <div class="kv__v mono">{{ d.hotspot ? d.hotspot.score.toFixed(1) : "--" }}</div>
+                </div>
+
+                @if (d.classes.length > 0) {
+                  <div class="subhead">Classes</div>
+                  <div class="list">
+                    @for (c of d.classes; track c.id) {
+                      <button type="button" class="pill" (click)="selectClass(c.id)">
+                        <span class="mono">{{ c.name }}</span>
+                        <span class="dim mono">{{ c.startLine }}-{{ c.endLine }}</span>
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+            @case ("class") {
+              <div class="detail">
+                <div class="detail__title mono">{{ d.classSymbol.name }}</div>
+                <div class="detail__sub mono dim" [title]="d.classSymbol.filePath">
+                  {{ d.classSymbol.filePath }}
+                </div>
+
+                <div class="kv">
+                  <div class="kv__k">lines</div>
+                  <div class="kv__v mono">{{ d.classSymbol.startLine }}-{{ d.classSymbol.endLine }}</div>
+                  <div class="kv__k">methods</div>
+                  <div class="kv__v mono">{{ d.methods.length }}</div>
+                </div>
+
+                @if (d.methods.length > 0) {
+                  <div class="subhead">Methods</div>
+                  <div class="list">
+                    @for (m of d.methods; track m.id) {
+                      <button type="button" class="pill" (click)="selectMethod(m.id)">
+                        <span class="mono">{{ m.name }}</span>
+                        <span class="dim mono">{{ m.metrics.lineCount }}L</span>
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+            @case ("method") {
+              <div class="detail">
+                <div class="detail__title mono">{{ d.method.name }}</div>
+                <div class="detail__sub mono dim">
+                  {{ d.method.className }} / {{ d.method.filePath }}
+                </div>
+
+                <div class="kv">
+                  <div class="kv__k">signature</div>
+                  <div class="kv__v mono">
+                    {{ d.method.visibility }} {{ d.method.name }}({{ d.method.metrics.parameterCount }} params)
+                  </div>
+                  <div class="kv__k">line range</div>
+                  <div class="kv__v mono">{{ d.method.startLine }}-{{ d.method.endLine }}</div>
+                  <div class="kv__k">metrics</div>
+                  <div class="kv__v mono">
+                    {{ d.method.metrics.lineCount }}L / {{ d.method.metrics.branchCount }}Br /
+                    {{ d.method.metrics.parameterCount }}P
+                  </div>
+                </div>
+
+                <div class="grid2">
+                  <section class="card">
+                    <div class="card__head">
+                      <div class="card__title">Duplicate Groups</div>
+                      <div class="card__meta mono">{{ d.duplicates.length }}</div>
+                    </div>
+                    @if (d.duplicates.length === 0) {
+                      <div class="muted">No duplicates were linked to this method in the report.</div>
+                    } @else {
+                      <div class="dups">
+                        @for (g of d.duplicates; track g.id) {
+                          <article class="dup">
+                            <div class="dup__head">
+                              <span class="badge" [class]="'badge--' + g.kind">{{ g.kind }}</span>
+                              <span class="mono dim">{{ g.id }}</span>
+                              <span class="mono dim">{{ g.occurrences.length }} occ</span>
+                            </div>
+                            @if (g.preview) {
+                              <pre class="pre">{{ g.preview }}</pre>
+                            }
+                          </article>
+                        }
+                      </div>
+                    }
+                  </section>
+
+                  <section class="card">
+                    <div class="card__head">
+                      <div class="card__title">References</div>
+                      <div class="card__meta mono">{{ d.references.length }}</div>
+                    </div>
+                    @if (d.references.length === 0) {
+                      <div class="muted">No references were collected for this method.</div>
+                    } @else {
+                      <div class="refs">
+                        <div class="thead">
+                          <div>File</div>
+                          <div class="num">Line</div>
+                          <div class="num">Col</div>
+                          <div>Snippet</div>
+                        </div>
+                        @for (ref of d.references; track ref.filePath + ':' + ref.line + ':' + ref.column) {
+                          <div class="tr">
+                            <div class="mono file" [title]="ref.filePath">{{ ref.filePath }}</div>
+                            <div class="mono num">{{ ref.line }}</div>
+                            <div class="mono num">{{ ref.column }}</div>
+                            <div class="mono snippet">{{ ref.snippet }}</div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </section>
+                </div>
+              </div>
+            }
+          }
+        }
+      </section>
+    </div>
+  </section>
+} @else {
+  <ngi-empty-state />
+}

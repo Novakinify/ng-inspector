@@ -1,0 +1,63 @@
+:root {
+  --bg0: #0b0e14;
+  --bg1: #0f1624;
+  --surface: #151f33;
+  --border: rgba(255, 255, 255, 0.14);
+  --text: #e9efff;
+  --muted: #a7b3cf;
+  --accent: #4dd4ff;
+  --accent2: #28ffbe;
+
+  --sev-error: #ff5a7a;
+  --sev-warning: #ffce5c;
+  --sev-info: #6aa8ff;
+
+  --shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.3);
+
+  --font-sans: "Space Grotesk", ui-sans-serif, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1100px 900px at 10% 0%, rgba(77, 212, 255, 0.11), transparent 55%),
+    radial-gradient(900px 700px at 85% 8%, rgba(40, 255, 190, 0.08), transparent 60%),
+    radial-gradient(800px 800px at 50% 100%, rgba(106, 168, 255, 0.07), transparent 60%),
+    linear-gradient(180deg, var(--bg0), var(--bg1));
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+a {
+  color: inherit;
+}
+
+.page {
+  animation: rise 0.16s ease-out both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

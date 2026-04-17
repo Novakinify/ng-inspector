@@ -6,6 +6,10 @@ Open-source Angular workspace auditor.
 
 Current status: early. CLI is primary; an Angular dashboard exists for local report viewing.
 
+## Planned At plannex.io
+
+This project was planned at plannex.io.
+
 ## Quick Start (From This Repo)
 
 1. Install deps:
@@ -49,6 +53,15 @@ The report is written inside the audited workspace:
 - `hotspotScores`: per-file hotspot scoring (complexity/duplication/spec/import coupling)
 - `analyzerCategories`: index of analyzers/categories contributing to the report
 
+### Using brief.json In plannex.io
+
+`brief.json` is a deterministic, rule-based engineering brief generated from the scan report. It groups findings into refactor tracks and emits task candidates with stable IDs, affected files, effort/impact, and (when available) dependencies.
+
+Plannex workflow (manual for now):
+1. Run the CLI audit for a workspace.
+2. Open `<workspace>/.ng-inspector/brief.json`.
+3. Copy/paste (or upload) the JSON into plannex.io to generate an initial refactoring blueprint plan (nodes + tasks + flow), then review and refine.
+
 ## Dashboard (Angular App)
 
 The dashboard is an Angular app (presentation only) living in `apps/dashboard`. It consumes an existing `report.json` file produced by the CLI.
@@ -74,6 +87,7 @@ npm run ng-inspector -- audit --workspace <path-to-angular-workspace>
 3. Use the left sidebar to navigate:
 - `Overview`: high-level counts
 - `Findings`: filter by severity/category/rule code and sort
+- `Lifecycle Risks`: lifecycle and cleanup risk findings with drilldown (when present in the report)
 - `Project Tree`: normalized folder tree view
 - `Hotspots`: top files by score
 - `Duplicates`: duplicate groups + occurrences
@@ -137,7 +151,7 @@ Import graph:
 
 ## Open-source and commercial direction
 
-ng-inspector’s core analysis engine is open source under Apache-2.0.
+ng-inspector's core analysis engine is open source under Apache-2.0.
 
 In the future, hosted features, enterprise workflows, team history, and premium integrations may be offered separately. The open-source core will remain publicly available under its published license.
 
